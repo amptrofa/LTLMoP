@@ -13,7 +13,7 @@ from matrixFunctions import *
 from CKBotSimHelper import *
 
 # needs to add the path of ltlmop_root to sys path
-sys.path.append('../../..')
+sys.path.append('../../../..')
 import lib.regions
 
 info = """CKBotSim
@@ -72,12 +72,12 @@ class CKBotSim:
 
 		# If regionfile=0, render the ground as default solid green terrain.
 		# Otherwise, load the regions file specified and draw the region colors on the ground.
-        # Initialize the region file interface
-        self.rfi = lib.regions.RegionFileInterface()
+        	# Initialize the region file interface
+        	self.rfi = lib.regions.RegionFileInterface()
 
 		# Load a region file if it has been specified on instantiation.
 		if (regionfile!=None):
-            self.rfi.readFile(regionfile)
+		        self.rfi.readFile(regionfile)
 			self.region_calib = region_calib
 		
 		# Make obstacles if they exist.
@@ -268,7 +268,6 @@ class CKBotSim:
 
 		# If we have region data, draw the individual regions and color them accordingly.
 		else:
-
 			# Render the boundary.
 			glPushMatrix()
 			color = (1, 1, 1)
@@ -282,18 +281,18 @@ class CKBotSim:
 			glPopMatrix()	
 	
 			# Render the remaining regions.
-            for region in self.rfi.regions:
-                glPushMatrix()
+	            	for region in self.rfi.regions:
+        	        	glPushMatrix()
 
-                glMaterialfv(GL_FRONT, GL_SPECULAR, [x for x in region.color])
+		                glMaterialfv(GL_FRONT, GL_SPECULAR, [x for x in region.color])
 
-                glBegin(GL_POLYGON)
-                for pt in region.getPoints():
-                    glNormal3f(*normal)
-                    glVertex3f(pt[0]*self.region_calib[0], d, -pt[1]*self.region_calib[1])
-                glEnd()
+                		glBegin(GL_POLYGON)
+		                for pt in region.getPoints():
+					glNormal3f(*normal)
+		                        glVertex3f(pt[0]*self.region_calib[0], d, -pt[1]*self.region_calib[1])
+		                glEnd()
 
-                glPopMatrix()
+                	glPopMatrix()
 
 	def _setCamera(self):
 		"""
