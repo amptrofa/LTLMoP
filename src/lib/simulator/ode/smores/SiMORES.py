@@ -51,7 +51,7 @@ class SiMORES(ShowBase):
         self.world.initSurfaceTable(1)
         self.world.setSurfaceEntry(0,0,1,.2,150,0,0,0,.002)
         self.space = OdeSimpleSpace() # for large number of bodies, consider OdeQuatTreeSpace()
-        self.space.setAutoCollideWorld(self.world) # Collisions occur in this world (seems redundant)
+        #self.space.setAutoCollideWorld(self.world) # Collisions occur in this world (seems redundant)
         self.contactGroup = OdeJointGroup()
         self.space.setAutoCollideJointGroup(self.contactGroup)
 
@@ -83,11 +83,32 @@ class SiMORES(ShowBase):
         mat.invertInPlace()
         self.mouseInterfaceNode.setMat(mat)
         self.enableMouse()
+    
+    def _nearbyCB(self,arg,geom1,geom2):
+        """
+        Callback when two geoms/spaces "might" be colliding
+        """
+        
+        contactEntry = OdeUtil.collide(geom1,geom2)
+        
+        for i in range(contactEntry.getNumContacts()):
+            contactGeom = contactEntry[i]
+            contact = OdeContact()
+            contact.setGeom(contactGeom)
+            
+            surface = OdeSurfaceParameters(4,10000)
+            surface.setBounce(0.1)
+
+            contact.setSurface(surface)
+
+            j = OdeContactJoint(self.world, self.contactGroup, contact)
+            j.attach(geom1.getBody(),geom2.getBody()) #attach appears to be undocumented in panda3d.ode, but works just like in pyOde
 
 
     def simPhysics(self,task):
-        self.space.autoCollide()
-        self.world.quickStep(globalClock.getDt())
+
+        self.space.collide((),self._nearbyCB)
+        self.world.step(globalClock.getDt())
         
         self.testModel.setPosQuat(self.render, self.testModelBody.getPosition(), Quat(self.testModelBody.getQuaternion()))
 
